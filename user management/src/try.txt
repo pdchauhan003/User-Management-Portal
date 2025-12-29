@@ -1,0 +1,400 @@
+Routess.jsx
+import React from 'react';
+import {BrowserRouter, Routes, Route} from 'react-router-dom';
+import AddUser from './Components/AddUser';
+import UpdateUser from './Components/UpdateUser';
+import UserList from './Components/UserList';
+function Routess(){
+    return(
+        <>
+            <BrowserRouter>
+                <Routes>
+                    <Route path='/' element={<UserList/>}/>
+                    <Route path='/add' element={<AddUser/>}/>
+                    <Route path='/update/:name' element={<UpdateUser/>}/>
+                </Routes>
+            </BrowserRouter>
+        </>
+    )
+}
+export default Routess;
+
+AddUser.jsx
+import React,{useReducer} from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
+const userData={
+    name:'',
+    age:null,
+    email:'',
+    password:'',
+    mobile:null
+}
+const reducer=(state,action)=>{
+    return {...state,[action.type]:action.value}
+}
+function AddUser(){
+    const[state,dispatch]=useReducer(reducer,userData);
+    const navigate=useNavigate();
+    const handleSubmit=async(e)=>{
+        e.preventDefault();
+        try{
+            const res=await axios.post('http://localhost:1706/add',state);
+            if(res.data.status == 'ok'){
+                toast.success(res.data.message);
+                console.log('success message and navigate home page')
+                navigate('/');
+            }
+            if(res.data.status=='errorpass'){
+                toast.error(res.data.message);
+            }
+            // toast.error(res.data.message)
+            // console.log('after added run again this message...')
+        }
+        catch(error){
+            toast.error('error in ading data',error)
+        }
+    }
+    return(
+        <>
+            <div className='iteams-center text-center mt-3 pt-0 font-bold'>
+                <h2 className='font-bold text-4xl'>Add new Data</h2>
+                <form onSubmit={handleSubmit} className='p-5 m-130 mt-5 rounded-xl' style={{background: "linear-gradient(gray, skyblue)",border:'1px',boxShadow:'0 0 20px black'}}>
+                    <input type='text' name='name' onChange={(e)=>dispatch({value:e.target.value,type:e.target.name})} placeholder='Enter Name' required
+                    className="m-0.2 border-3 rounded p-1 "/>
+                    <br/>
+                    <input type='email' name='email' onChange={(e)=>dispatch({value:e.target.value,type:e.target.name})} placeholder='Enter Email' required
+                    className="m-1 border-3 p-1 gap-5 rounded"/>
+                    <br/>
+                    <input type='password' name='password' onChange={(e)=>dispatch({value:e.target.value,type:e.target.name})} placeholder='Enter Password' required
+                    className="m-1 border-3 p-1 gap-5 rounded"/>
+                    <br/>
+                    <input type='number' name='age'onChange={(e)=>dispatch({value:e.target.value,type:e.target.name})} placeholder='Enter Age' required
+                    className="m-1 border-3 p-1 gap-5 rounded"/>
+                    <br/>
+                    <input type='number' name='mobile' onChange={(e)=>dispatch({value:e.target.value,type:e.target.name})} placeholder='Enter MobileNumber' maxLength={10} minLength={10} required
+                    className="m-1 border-3 p-1 gap-5 rounded"/>
+                    <br/>
+                    <input className='mt-1 rounded-xl bg-black text-white w-50 h-10' type='submit'/>
+                    
+                </form>
+            </div>
+        </>
+    )
+}
+export default AddUser
+
+
+UpdateUser.jsx
+import React,{useReducer} from 'react';
+import axios from 'axios';
+import { useNavigate,useParams } from 'react-router-dom';
+import toast from "react-hot-toast";
+const userData={
+    age:null,
+    email:'',
+    password:'',
+    mobile:null
+}
+const reducer=(state,action)=>{
+    return {...state,[action.type]:action.value}
+}
+function UpdateUser(){
+    const[state,dispatch]=useReducer(reducer,userData);
+    const navigate=useNavigate();
+     const {name}=useParams();
+    const handleSubmit=async(e)=>{
+        e.preventDefault();
+        try{
+            const res=await axios.put(`http://localhost:1706/update/${name}`,state);
+            if(res.data.status == 'ok'){
+                toast.success(res.data.message);
+                navigate('/');
+            }
+            else if(res.data.status=='emailerror'){
+                toast.error(res.data.message);
+            }
+            else if(res.data.status=='mobileerror'){
+                toast(res.data.message)
+            }
+            else{
+                toast.error(res.data.message)
+            }
+        }
+        catch(error){
+            toast.error('error in ading data',error)
+        }
+    }
+    return(
+        <>
+        
+            <div className='flex flex-col justify-center items-center text-center mt-0 font-bold'>
+                <h2 className='font-bold text-3xl mb-5'>Update Data of {name}</h2>
+                <div className='p-10 mt-5 rounded-xl w-min' style={{background: "linear-gradient(gray, skyblue)",border:'5px',boxShadow:'0 0 10px black'}}>
+                    <form onSubmit={handleSubmit} className='items-center'>
+                        <input type='email' name='email' onChange={(e)=>dispatch({value:e.target.value,type:e.target.name})} placeholder='Enter Email' required
+                        className="m-1 border-3 rounded p-1"/>
+                        <br/>
+                        <input type='password' name='password' onChange={(e)=>dispatch({value:e.target.value,type:e.target.name})} placeholder='Enter Password' required
+                        className="m-1 border-3 rounded p-1 "/>
+                        <br/>
+                        <input type='number' name='age'onChange={(e)=>dispatch({value:e.target.value,type:e.target.name})} placeholder='Enter Age' required
+                        className="m-1 border-3 rounded p-1 "/>
+                        <br/>
+                        <input type='number' name='mobile' onChange={(e)=>dispatch({value:e.target.value,type:e.target.name})} placeholder='Enter MobileNumber' maxLength={10} minLength={10} required
+                        className="m-1 border-3 rounded p-1 "/>
+                        <br/>
+                        <input type='submit' className='mt-1 rounded-xl bg-black text-white w-50 h-10'/>
+                    </form>
+                </div>
+            </div>
+       
+        </>
+    )
+}
+export default UpdateUser;
+
+
+
+
+UserList.jsx
+import React from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import toast from 'react-hot-toast';
+function UserList(){
+    const navigate=useNavigate();
+    const[data,setData]=useState([]);
+    async function fetchData(){
+        try{
+            const res=await axios.get('http://localhost:1706/');
+            setData(res.data.user)
+        }
+        catch(error){
+            console.log('error in fetching data',error);
+        }
+    }  
+    fetchData();
+    const handleAdd=()=>{
+        navigate('/add')
+    }
+    const handleUpdate=(name)=>{
+        navigate(`/update/${name}`)
+    }
+
+    const handleDelete=async(name)=>{
+        try{
+            await axios.delete(`http://localhost:1706/delete/${name}`);
+            toast.success(`recode of ${name} was deleted`);
+            fetchData();
+        }
+        catch(error){
+            console.log('error in delete',error);
+            toast.error('error in deleting')
+        }
+    }
+    return(
+        <>
+            <div className='justify-center iteams-center text-center mt-1 pt-1'>
+                <h3 className='font-bold text-4xl'>User List</h3>
+                <span className='text-gray-600 font-bold capitalize mb-1'>If Add new Nser Then click this button ---- </span><button className='bg-gray-300 text-white p-2 rounded-md w-20' onClick={handleAdd}>Add</button>
+                <br/>
+                <table className="mx-auto mt-3 text-center rounded-xl border-hidden" style={{background: "linear-gradient(gray, pink)",boxShadow:"0 0 10px black"}} cellPadding={'10px'} cellSpacing={'10px'} rules='all' >
+                    <thead className="text-dark">
+                        <tr>
+                            <th className="px-4 py-2 border">Id</th>
+                            <th className="px-4 py-2 border">Name</th>
+                            <th className="px-4 py-2 border">Age</th>
+                            <th className="px-4 py-2 border">Email</th>
+                            <th className="px-4 py-2 border">Mobile Number</th>
+                            <th className="px-4 py-2 border">Adit</th>
+                            <th className="px-4 py-2 border">Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody className=" text-dark-600" >
+                        {
+                            data.map((item,index)=>(
+                                <tr key={index} className="hover:bg-gray-400">
+                                    <td className="border px-4 py-2">{index}</td>
+                                    <td className="border px-4 py-2">{item.name}</td>
+                                    <td className="border px-4 py-2">{item.age}</td>
+                                    <td className="border px-4 py-2">{item.email}</td>
+                                    <td className="border px-4 py-2">{item.mobile}</td>
+                                    <td className="border px-4 py-2"><button className='w-full p-1 rounded-sm bg-gray-300' onClick={()=>handleUpdate(item.name)}>Update</button></td>
+                                    <td className="border px-4 py-2"><button onClick={()=>handleDelete(item.name)} className='w-full p-1 rounded-sm bg-red-200'>Delete</button></td>
+                                </tr>
+                            ))
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </>
+    )
+}
+export default UserList;
+
+App.jsx
+// import Postss from "./Pages/Postss";
+// import FormData from "./FormData";
+import Routess from './Routess';
+function App() {
+  return (
+    <>
+    {/* <div className="min-h-screen bg-gray-100"> */}
+      <Routess/>
+    {/* </div> */}
+    </>
+  );
+}
+
+export default App;
+
+
+Backend 
+Server.js
+const express=require('express');
+const app=express();
+const bodyparser=require('body-parser');
+const cors=require('cors');
+require('dotenv').config();
+const mg=require('mongoose');
+// const jwt=require('jsonwebtoken');
+
+app.use(cors());
+app.use(express.json())
+app.use(bodyparser.urlencoded({extended:true}));
+
+
+mg.connect(process.env.Mongo_url)
+ .then(()=>{console.log('mongodb connection success')})
+ .catch((error)=>{console.log('mongo connection error',error)})
+
+const Schema=new mg.Schema({
+    name:{type:String,required:true},
+    age:{type:Number,required:true},
+    email:{type:String,required:true},
+    password:{type:String,required:true},
+    mobile:{type:Number,required:true}
+})
+
+const User=mg.model('User',Schema);
+
+// const SecretKey='xyycvzzct';
+
+app.post('/add',async(req,res)=>{
+    try{
+        const {name,age,email,password,mobile}=req.body;
+        if(!email || !password || !mobile || !name || !age){
+            return res.json({status:'error',message:'plz fillup all fields...'})
+        }
+        const emailcheck=await User.findOne({email});
+        const mobilecheck=await User.findOne({mobile});
+        if(emailcheck){
+            return res.json({status:'error',message:'Email are wxists'})
+        }
+        if(mobilecheck){
+            return res.json({status:'error',message:'number are wxists'})
+        }
+        if(mobile.toString().length!=10){
+            return res.json({status:'error',message:'number is not 10 digits'})
+        }
+        if(!(password.length>5 && /[A-Z]/.test(password) && /[a-z]/.test(password) && /[^A-Za-z0-9]/.test(password)) ){
+            return res.json({status:'error',message:'Password must contain uppercase, lowercase, symbol and minimum length 6'})
+        }
+        const user=new User({name,age,email,password,mobile});
+        await user.save();
+        // const token=jwt.sign({id:user._id,email:user.email},SecretKey,{expiresIn:'1D'});
+        return res.json({status:'ok',message:'Added successfull'});
+    }
+    catch(error){
+        console.log('error in adding data',error);
+        return res.json({status:'error',message:'error in adding data'})
+    }
+})
+app.get('/',async(req,res)=>{
+    try{
+        const user=await User.find()
+        // console.log('fetching data....');
+        return res.json({status:'ok',message:'Your Data',user})
+    }
+    catch(error){
+        console.log('error is data fetching');
+        return res.json({status:'error',message:'error in fetching'});
+    }
+})
+
+app.put('/update/:name',async(req,res)=>{
+    try{
+        const {name}=req.params;
+        const {age,email,password,mobile}=req.body;
+        if(!email || !password || !mobile || !age){
+            return res.json({status:'error',message:'plz fillup all fields...'})
+        }
+        if(mobile.toString().length!=10){
+            return res.json({status:'error',message:'number is not 10 digits'})
+        }
+        if(!(password.length>5 && /[A-Z]/.test(password) && /[a-z]/.test(password) && /[^A-Za-z0-9]/.test(password)) ){
+            return res.json({status:'error',message:'Password must contain uppercase, lowercase, symbol and minimum length 6'})
+        }
+        const namecheck=await User.findOne({name});
+        if(email != namecheck.email){
+            const emailExits=await User.findOne({
+                email,
+                name:{$ne:name}
+            })
+            if(emailExits){
+                return res.json({status:'emailerror',message:'Email already exits...'});
+            }
+            else{
+            console.log('email does not exits in other persons ids')}
+        }
+        if(mobile != namecheck.mobile){
+            const mobileExits=await User.findOne({
+                mobile,
+                name:{$ne:name}
+            })
+            if(mobileExits){
+                return res.json({status:'mobileerror',message:'Mobile number already exits...'});
+            }
+            else{
+            console.log('mobile number does not exits in other persons ids')}
+        }
+        const udata=await User.findOneAndUpdate(
+            {name:name},
+            {age,email,password,mobile},{new:true}
+        )
+        if(udata){
+            return res.json({status:'ok',message:'Data Updated Successfully',user:udata});
+        }
+        else{
+            return res.json({status:'error',message:'Data Updatedion failed'});
+        }
+    }
+    catch(error){
+        console.log('error in updating data');
+        return res.json({status:'error',message:'error in updating data...'})
+    }
+
+})
+
+app.delete('/delete/:name',async(req,res)=>{
+    try{
+        const name=req.params.name;
+        const deleteData=await User.findOneAndDelete({name})
+        if(deleteData){
+            return res.json({status:'ok',message:`${name} its data deleted succefully`});
+        }
+        else{
+            return res.json({status:'error',message:'Data deletion failed'});
+        }
+    }
+    catch(error){
+        console.log('error in deliting data');
+        return res.json({status:'error',message:'error in deleting data...'})
+    }
+})
+app.listen(1706,()=>{
+    console.log('server run in port 1706');
+})
