@@ -3,7 +3,7 @@ import {BrowserRouter, Routes, Route} from 'react-router-dom';
 import AddUser from './Components/AddUser';
 import UpdateUser from './Components/UpdateUser';
 import UserList from './Components/UserList';
-import Nopage from './Components/Nopage'
+// import Nopage from './Components/Nopage'
 import {Toaster} from 'react-hot-toast';
 function Routess(){
     return(
